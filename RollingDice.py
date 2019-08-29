@@ -1,6 +1,6 @@
 import random
 def generateRandomNumber(maximumLimit):
-    randomNumber=random.randint(1, maxLimit)
+    randomNumber=random.randint(1, maximumLimit)
     return randomNumber
 
 
