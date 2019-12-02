@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <stdlib.h>
+#include <fstream>
 
 #define _XOPEN_SOURCE_EXTENDED 1
 #define PORT 8000
@@ -19,6 +21,7 @@ private:
 	int address_lenth = sizeof(socket_address);
 	char buffer[1024];
 	char *message = "Hello Cient, I recived your data";
+	char data[10240];
 
 public:
 	Server(){
@@ -64,13 +67,36 @@ public:
 			cout<<"Connection accepted"<<endl;
 		}
 	}
+	
+	void get_process_statics(){
+    	int result;
+    	ifstream infile; 
+    
+    	result = system("ps -o pid,user,%cpu,%mem ax | sort -b -k3 -r > process_statics.txt");
+
+		if(result >= 0){
+	    	infile.open("process_statics.txt");
+
+        	for (int i = 0; i <= 10240; i++){
+            	while (!infile.eof()) {  
+					data[i] = infile.get();
+                    break;
+				}
+        	}
+        	infile.close();
+		}else{
+			cout<<"Something went wrong"<<endl;
+			strcpy(data, "Something went wrong, Can't get process statics"); 
+		}
+	}
 
 	void recieve_and_send(){
 		while(1){
 			memset(buffer,0,sizeof(buffer));
 			if(recv(socket_fd_client, buffer, 1024, 0) > 0) {
-   				cout<<"Data:: "<< buffer << endl; 
-    			send(socket_fd_client, message , strlen(message), 0);
+   				cout<<"Data:: "<< buffer << endl;
+				get_process_statics();
+    			send(socket_fd_client, data , strlen(data), 0);
 			}else{
 				close(socket_fd_client);				
 				break;
