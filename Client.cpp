@@ -52,6 +52,7 @@ public:
 
     void send_and_recieve_data(){
 	    while(1){
+            memset(buffer,0,sizeof(buffer));
 	    	cout<<"Enter the data :";
 		    cin.getline(message,50);
 		    send(socket_fd , message, strlen(message), 0);
