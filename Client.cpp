@@ -14,7 +14,7 @@ private:
     int socket_fd; 
     struct sockaddr_in server_address; 
     char message[50]; 
-    char buffer[1024] = {0}; 
+    char buffer[10240] = {0}; 
 
 public:
     Client(){
@@ -55,8 +55,9 @@ public:
 	    	cout<<"Enter the data :";
 		    cin.getline(message,50);
 		    send(socket_fd , message, strlen(message), 0);
-    	    recv(socket_fd , buffer, 1024,0); 
-	        cout<<"Data::"<< buffer <<endl;
+    	    recv(socket_fd , buffer, 10240,0); 
+	        cout << "Data from the server::" << endl;
+            cout << buffer << endl;
         }	
     }
 };
