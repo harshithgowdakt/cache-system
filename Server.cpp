@@ -93,10 +93,16 @@ public:
 	void recieve_and_send(){
 		while(1){
 			memset(buffer,0,sizeof(buffer));
+    
 			if(recv(socket_fd_client, buffer, 1024, 0) > 0) {
-   				cout<<"Data:: "<< buffer << endl;
-				get_process_statics();
-    			send(socket_fd_client, data , strlen(data), 0);
+   				cout<<"Data from the client :: "<< buffer << endl;
+
+				if(strcmp(buffer,"GetProcessStatistics") == 0){
+					get_process_statics();
+    				send(socket_fd_client, data , strlen(data), 0);
+				}else{
+					send(socket_fd_client, message , strlen(message), 0);
+				}
 			}else{
 				close(socket_fd_client);				
 				break;
@@ -126,3 +132,4 @@ int main(){
 	server.close_socket();
 	return 0;
 }
+
