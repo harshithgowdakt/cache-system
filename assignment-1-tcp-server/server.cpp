@@ -1,7 +1,6 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/types.h> 
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -93,11 +92,11 @@ public:
 		return "key does not exists";
 	}
 
-	string process_data(json data){
+	string process_request(json data){
 		string response;
-		if (data["command"]=="GET"){
+		if (data["command"] == "GET"){
 			response =	get_data(data["key"]);
-		}else if(data["command"]=="SET"){
+		}else if(data["command"] == "SET"){
 			response = save_data(data["key"], data["value"]);
 		}
 		return response;
@@ -109,7 +108,7 @@ public:
 		if(recv(socket_fd_client, buffer, 1024, 0) > 0){
 			cout << "Request ::" << buffer << "\n";
 			data = json::parse(buffer);
-		 	response = process_data(data);
+		 	response = process_request(data);
 			 if ((send(socket_fd_client, response.c_str(), strlen(response.c_str()), 0)) < 0){
 				close_socket();
 				cout<< "Error while sending response \n";

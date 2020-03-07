@@ -15,7 +15,7 @@ class Client{
 private:
     int socket_fd; 
     struct sockaddr_in server_address; 
-    char data[1024] = R"({"command":"GET", "key":"id", "value":"harshith"})"; 
+    char data[1024] = R"({"key":"id"})"; 
 
 public:
     Client(){
