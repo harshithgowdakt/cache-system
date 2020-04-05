@@ -12,7 +12,7 @@ class Server{
 private:
 	ServerConnection serverConnection;
 	DB db;
-
+	
 	string process_data(json data);
 	void process_req();
 
@@ -26,7 +26,7 @@ string Server::process_data(json data){
 	if (data["command"] == "GET"){
 		response = db.get_data(data["key"]);
 	}else if(data["command"] == "SET"){
-		response = db.save_data(data["key"], data["value"]);
+		response = db.save_data(data["key"], data["value"], data["ttl"]);
 	}else if(data["command"] == "PUT"){
 		response = db.update_data(data["key"], data["value"]);;
 	}else if(data["command"] == "DELETE"){
@@ -64,6 +64,7 @@ void Server::start(){
 }
 
 void Server::stop(){
+	db.join_db_threads();
 	serverConnection.close_socket();
 }
 

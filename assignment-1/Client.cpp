@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <string.h>
+#include <time.h>
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include "connection/ClientConnection.h"
@@ -27,6 +28,7 @@ string Client::to_upper(string str){
 
 string Client::get_user_data(){
     string command, key, value;
+    time_t ttl;
     json json_data;
 
     cout << "Enter the command::";
@@ -41,8 +43,10 @@ string Client::get_user_data(){
     } else if (command == "SET" || command == "PUT" ){
         cin >> key;
         cin >> value;
+        cin >> ttl;
         json_data["key"] = key;
         json_data["value"] = value;
+        json_data["ttl"] = ttl;
     } 
     return json_data.dump();
 }
