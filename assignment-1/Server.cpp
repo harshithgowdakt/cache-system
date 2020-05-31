@@ -27,12 +27,16 @@ string Server::process_data(json data){
 		response = db.get_data(data["key"]);
 	}else if(data["command"] == "SET"){
 		response = db.save_data(data["key"], data["value"], data["ttl"]);
-	}else if(data["command"] == "PUT"){
-		response = db.update_data(data["key"], data["value"]);;
-	}else if(data["command"] == "DELETE"){
+	}else if(data["command"] == "DEL"){
 		response = db.delete_data(data["key"]);;
+	}else if(data["command"] == "HSET"){
+		response = db.h_set(data["key"], data["field"], data["value"]);
+	}else if(data["command"] == "HGET"){
+		response = db.h_get(data["key"], data["field"]);
+	}else if(data["command"] == "HGETALL"){
+		response = db.h_get_all(data["key"]);
 	}else{
-		response = "Invalid command";
+		response = "ERR unknown command";
 	}
 	return response;
 }

@@ -27,7 +27,7 @@ string Client::to_upper(string str){
 }
 
 string Client::get_user_data(){
-    string command, key, value;
+    string command, key, value, field;
     time_t ttl;
     json json_data;
 
@@ -37,17 +37,29 @@ string Client::get_user_data(){
     json_data["command"] = command;
     if(command == "EXIT"){
         close_connection();
-    }else if (command == "GET" || command == "DELETE"){
+    }else if (command == "GET" || command == "DEL" || command == "HGETALL"){
         cin >> key;
         json_data["key"] = key;
-    } else if (command == "SET" || command == "PUT" ){
+    } else if (command == "SET"){
         cin >> key;
         cin >> value;
         cin >> ttl;
         json_data["key"] = key;
         json_data["value"] = value;
         json_data["ttl"] = ttl;
-    } 
+    } else if(command == "HSET"){
+        cin >> key;
+        cin >> field;
+        cin >> value;
+        json_data["key"] = key;
+        json_data["field"] = field;
+        json_data["value"] = value;
+    }else if(command == "HGET"){
+        cin >> key;
+        cin >> field;
+        json_data["key"] = key;
+        json_data["field"] = field;
+    }
     return json_data.dump();
 }
 
@@ -67,7 +79,7 @@ void Client::send_request(){
         string request = get_user_data();
         clientConnection.send_req(request.c_str());
         buffer = clientConnection.recieve_res();
-        cout << "Response::" << buffer << "\n";
+        cout << buffer << "\n";
     }
 }
 
