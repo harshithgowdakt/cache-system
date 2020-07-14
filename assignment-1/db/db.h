@@ -5,6 +5,11 @@
 #include <deque>
 #include <time.h>
 #include <nlohmann/json.hpp>
+#include <fstream> 
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/deque.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 #define EMPTY_LIST_MSG "empty list or set"
 #define NIL_MSG "nil"
@@ -42,5 +47,7 @@ class DB {
         string l_pop(string key);
         int l_len(string key);
         string l_range(string key, int start, int stop);
-        void join_db_threads();  
+        void join_db_threads(); 
+        void take_backup();
+        void restore_backup();
 };

@@ -3,6 +3,9 @@
 #include <nlohmann/json.hpp>
 #include "connection/ServerConnection.h"
 #include "db/db.h"
+#include <unistd.h>
+#include <cstdlib>
+#include <signal.h>
 
 using namespace std;
 using json = nlohmann::json;
@@ -12,13 +15,13 @@ class Server{
 private:
 	ServerConnection serverConnection;
 	DB db;
-	
+	static Server instance;
 	string process_data(json data);
-	void *process_req();
+	void process_req();
 
 public:
 	void start();
-	void stop();
+	void stop(int signum);	
 };
 
 string Server::process_data(json data){
@@ -53,7 +56,7 @@ string Server::process_data(json data){
 	return response;
 }
 
-void *Server::process_req(){
+void Server::process_req(){
 	char *buffer;
 	json data; string response;
 	while (true){
@@ -73,21 +76,27 @@ void Server::start(){
 	serverConnection.create_socket();
 	serverConnection.bind_address();
 	serverConnection.listen_to_request();
+	db.restore_backup();
 	while(true){
-		pthread_t thread_id;pthread_t thread_id;pthread_t thread_id;
-		int  socket_fd = serverConnection.accept_connection();
+		serverConnection.accept_connection();
 		process_req();
 	}
 }
 
-void Server::stop(){
-	db.join_db_threads();
+Server server;
+
+void Server::stop(int signum){
+	db.take_backup();
 	serverConnection.close_socket();
+	exit(signum);
+}
+
+void signal_callback_handler(int signum){
+	server.stop(signum);
 }
 
 int main(){
-	Server server;
+	signal(SIGINT, signal_callback_handler);
 	server.start();
-	server.stop();
 	return 0;
 }

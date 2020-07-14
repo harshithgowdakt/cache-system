@@ -209,3 +209,17 @@ string DB::l_range(string key, int start_index, int stop_index){
     }
     return result;
 }
+
+void DB::take_backup(){
+    fstream backup_file("backup");
+    boost::archive::text_oarchive oarch(backup_file);
+    oarch << list;
+    cout <<"Took the data backup successfully \n";
+}
+
+void DB::restore_backup(){
+   std::ifstream backup_file("backup");
+   boost::archive::text_iarchive iarch(backup_file);
+   iarch >> list;
+   std::cout << "Restored the data successfully \n";
+}
