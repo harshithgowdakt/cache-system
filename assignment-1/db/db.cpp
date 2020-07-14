@@ -15,6 +15,7 @@ mutex mute;
 DB::DB(){}
 
 bool DB::is_key_exists(string key){
+    map<string, string>::iterator db_itr;
     for (db_itr = data_base.begin(); db_itr != data_base.end(); ++db_itr){
         if (db_itr->first == key){
             return true;
@@ -24,6 +25,7 @@ bool DB::is_key_exists(string key){
 }
 
 bool DB::is_key_exists_in_hmap(string key){
+    map<string, vct_of_pair>::iterator hmap_itr;
     for (hmap_itr = hash_map.begin(); hmap_itr != hash_map.end(); ++hmap_itr){
         if (hmap_itr->first == key){
             return true;
@@ -33,6 +35,7 @@ bool DB::is_key_exists_in_hmap(string key){
 }
 
 bool DB::is_key_exists_in_list(string key){
+    map<string, deque<string>>::iterator list_itr;
     for (list_itr = list.begin(); list_itr != list.end(); ++list_itr){
         if (list_itr->first == key){
             return true;
@@ -71,6 +74,7 @@ string DB::save_data(string key, string value, int ttl){
     if(!is_key_exists(key)){
         data_base.insert(pair<string, string>(key, value));
     }else{
+        map<string, string>::iterator db_itr;
         db_itr = data_base.find(key);
         if (db_itr != data_base.end()){
             db_itr->second = value;
@@ -84,6 +88,7 @@ string DB::save_data(string key, string value, int ttl){
 
 string DB::get_data(string key){
     lock_guard<mutex> guard(mute);
+    map<string, string>::iterator db_itr;
     for (db_itr = data_base.begin(); db_itr != data_base.end(); ++db_itr){
         if (db_itr->first == key){
            return db_itr->second;
@@ -211,15 +216,32 @@ string DB::l_range(string key, int start_index, int stop_index){
 }
 
 void DB::take_backup(){
-    fstream backup_file("backup");
-    boost::archive::text_oarchive oarch(backup_file);
-    oarch << list;
+    fstream list_backup_file("list_backup");
+    boost::archive::text_oarchive list_oarch(list_backup_file);
+    list_oarch << list;
+
+    fstream map_backup_file("map_backup");
+    boost::archive::text_oarchive map_oarch(map_backup_file);
+    map_oarch << data_base;
+
+    fstream hashmap_backup_file("hashmap_backup");
+    boost::archive::text_oarchive hashmap_oarch(hashmap_backup_file);
+    hashmap_oarch << hash_map;
     cout <<"Took the data backup successfully \n";
 }
 
 void DB::restore_backup(){
-   std::ifstream backup_file("backup");
-   boost::archive::text_iarchive iarch(backup_file);
-   iarch >> list;
+   std::ifstream list_backup_file("list_backup");
+   boost::archive::text_iarchive list_iarch(list_backup_file);
+   list_iarch >> list;
+
+   std::ifstream map_backup_file("map_backup");
+   boost::archive::text_iarchive map_iarch(map_backup_file);
+   map_iarch >> data_base;
+
+   std::ifstream hashmap_backup_file("hashmap_backup");
+   boost::archive::text_iarchive hashmap_iarch(hashmap_backup_file);
+   hashmap_iarch >> hash_map;
+
    std::cout << "Restored the data successfully \n";
 }

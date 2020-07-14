@@ -8,6 +8,7 @@
 #include <fstream> 
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/deque.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
@@ -21,12 +22,9 @@ typedef vector<pair<string,string>> vct_of_pair;
 class DB {
     private:
         map<string, string> data_base;
-        map<string, string>::iterator db_itr;
         map<string, vct_of_pair> hash_map;
-        map<string, vct_of_pair>::iterator hmap_itr;
-        vct_of_pair::iterator vct_itr;
         map<string, deque<string>> list;
-        map<string, deque<string>>::iterator list_itr;
+
         using callback_func = string (DB::*)(string);
         bool is_key_exists(string key);
         bool is_field_exists(string key, string field);
