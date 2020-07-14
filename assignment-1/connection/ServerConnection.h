@@ -12,7 +12,7 @@ class ServerConnection {
         void create_socket();
         void bind_address();
         void listen_to_request();
-        void accept_connection();
+        int accept_connection();
         void close_socket();
         char *recieve_req();
         int send_res(const char *data);

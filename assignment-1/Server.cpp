@@ -14,7 +14,7 @@ private:
 	DB db;
 	
 	string process_data(json data);
-	void process_req();
+	void *process_req();
 
 public:
 	void start();
@@ -28,20 +28,32 @@ string Server::process_data(json data){
 	}else if(data["command"] == "SET"){
 		response = db.save_data(data["key"], data["value"], data["ttl"]);
 	}else if(data["command"] == "DEL"){
-		response = db.delete_data(data["key"]);;
+		int res = db.delete_data(data["key"]);
+		response = to_string(res);
 	}else if(data["command"] == "HSET"){
-		response = db.h_set(data["key"], data["field"], data["value"]);
+		int res = db.h_set(data["key"], data["field"], data["value"]);
+		response = to_string(res);
 	}else if(data["command"] == "HGET"){
 		response = db.h_get(data["key"], data["field"]);
 	}else if(data["command"] == "HGETALL"){
 		response = db.h_get_all(data["key"]);
+	}else if(data["command"] == "LPUSH"){
+		int length = db.l_push(data["key"], data["value"]);
+		response = to_string(length);
+	}else if(data["command"] == "LPOP"){
+		response = db.l_pop(data["key"]);
+	}else if(data["command"] == "LLEN"){
+		int length = db.l_len(data["key"]);
+		response = to_string(length);
+	}else if(data["command"] == "LRANGE"){
+		response = db.l_range(data["key"], data["start_index"], data["stop_index"]);
 	}else{
 		response = "ERR unknown command";
 	}
 	return response;
 }
 
-void Server::process_req(){
+void *Server::process_req(){
 	char *buffer;
 	json data; string response;
 	while (true){
@@ -62,7 +74,8 @@ void Server::start(){
 	serverConnection.bind_address();
 	serverConnection.listen_to_request();
 	while(true){
-		serverConnection.accept_connection();
+		pthread_t thread_id;pthread_t thread_id;pthread_t thread_id;
+		int  socket_fd = serverConnection.accept_connection();
 		process_req();
 	}
 }

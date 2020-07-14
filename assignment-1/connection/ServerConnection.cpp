@@ -43,13 +43,14 @@ void ServerConnection::listen_to_request(){
 	cout<<"Listening to incoming request....... \n";	
 }
 
-void ServerConnection::accept_connection(){
+int ServerConnection::accept_connection(){
 	socket_fd_client = accept(socket_fd, (struct sockaddr *)&socket_address,(socklen_t*)&address_lenth);
 	if (socket_fd_client < 0) { 
 		cout << "Couldn't accept the connection \n"; 
 		close_socket();
 	} 
 	cout<<"Connection accepted \n";
+	return socket_fd_client;
 }
 
 char * ServerConnection::recieve_req(){

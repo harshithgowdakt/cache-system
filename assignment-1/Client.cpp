@@ -29,6 +29,7 @@ string Client::to_upper(string str){
 string Client::get_user_data(){
     string command, key, value, field;
     time_t ttl;
+    int start_index, stop_index;
     json json_data;
 
     cout << "Enter the command::";
@@ -37,7 +38,9 @@ string Client::get_user_data(){
     json_data["command"] = command;
     if(command == "EXIT"){
         close_connection();
-    }else if (command == "GET" || command == "DEL" || command == "HGETALL"){
+    }else if (command == "GET" || command == "DEL" || 
+              command == "HGETALL" || command == "LPOP" ||
+              command == "LLEN"){
         cin >> key;
         json_data["key"] = key;
     } else if (command == "SET"){
@@ -59,6 +62,20 @@ string Client::get_user_data(){
         cin >> field;
         json_data["key"] = key;
         json_data["field"] = field;
+    }else if(command == "LPUSH"){
+        cin >> key;
+        cin >> value;
+        json_data["key"] = key;
+        json_data["value"] = value;
+    }else if(command == "LRANGE"){
+        cin >> key;
+        cin >> start_index;
+        cin >> stop_index;
+        json_data["key"] = key;
+        json_data["start_index"] = start_index;
+        json_data["stop_index"] = stop_index;
+    }else{
+        cout << "ERR unknown command \n";
     }
     return json_data.dump();
 }
