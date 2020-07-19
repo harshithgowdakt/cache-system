@@ -1,2 +1,7 @@
 Server
 Client
+hashmap_backup
+list_backup
+map_backup
+tests/**/list-spec
+tests/**/square-spec
