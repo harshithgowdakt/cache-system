@@ -12,19 +12,18 @@ using namespace std;
 using json = nlohmann::json;
 
 class Server{
+	private:
+		ServerConnection serverConnection;
+		Map mapObj;
+		List listObj;
+		Hashmap hashmapObj;
+		
+		string process_data(json data);
+		void process_req();
 
-private:
-	ServerConnection serverConnection;
-	Map mapObj;
-	List listObj;
-	Hashmap hashmapObj;
-	static Server instance;
-	string process_data(json data);
-	void process_req();
-
-public:
-	void start();
-	void stop(int signum);	
+	public:
+		void start();
+		void stop(int signum);	
 };
 
 string Server::process_data(json data){
