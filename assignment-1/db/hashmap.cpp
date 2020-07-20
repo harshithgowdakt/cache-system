@@ -60,11 +60,12 @@ string Hashmap::h_get_all(string key){
         }
         if (!result.empty()) {
 		    result.pop_back();
+            return result;
 	    }
+        return EMPTY_LIST_MSG;
     }else{
         return EMPTY_LIST_MSG;
     }
-    return result;
 }
 
 void Hashmap::take_backup(){

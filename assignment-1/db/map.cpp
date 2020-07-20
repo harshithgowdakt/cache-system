@@ -21,22 +21,22 @@ bool Map::is_key_exists(string key){
     return false;
 }
 
-void Map::setTimeout(callback_func callback, int ttl, string key){
-    std::this_thread::sleep_for (std::chrono::seconds(ttl));
-    (this->*callback)(key);
-}
+// void Map::setTimeout(callback_func callback, int ttl, string key){
+//     std::this_thread::sleep_for (std::chrono::seconds(ttl));
+//     (this->*callback)(key);
+// }
 
-void Map::join_db_threads(){
-    for(int i = 1; i <= thread_count; i++){
-        if(threads[i].joinable()) threads[i].join();
-    }
-}
+// void Map::join_db_threads(){
+//     for(int i = 1; i <= thread_count; i++){
+//         if(threads[i].joinable()) threads[i].join();
+//     }
+// }
 
-void Map::set_timer(int ttl, string key){
-    if(thread_count<MAX_THREADS){
-        threads[++thread_count] = thread(&Map::setTimeout, this, &Map::delete_data, ttl, key);
-    }
-}
+// void Map::set_timer(int ttl, string key){
+//     if(thread_count<MAX_THREADS){
+//         threads[++thread_count] = thread(&Map::setTimeout, this, &Map::delete_data, ttl, key);
+//     }
+// }
 
 string Map::save_data(string key, string value, int ttl){
     if(!is_key_exists(key)){
@@ -48,9 +48,9 @@ string Map::save_data(string key, string value, int ttl){
             db_itr->second = value;
         }   
     }
-    if(ttl >= 0){
-        set_timer(ttl,key);
-    }
+    // if(ttl >= 0){
+    //     set_timer(ttl,key);
+    // }
     return "OK";
 }
 
