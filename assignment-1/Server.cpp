@@ -2,14 +2,13 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <signal.h>
-#include <nlohmann/json.hpp>
+#include <vector>
 #include "connection/ServerConnection.h"
 #include "db/map.h"
 #include "db/hashmap.h"
 #include "db/list.h"
 
 using namespace std;
-using json = nlohmann::json;
 
 class Server{
 	private:
@@ -18,7 +17,9 @@ class Server{
 		List listObj;
 		Hashmap hashmapObj;
 		
-		string process_data(json data);
+		vector<string> split_string(char *command);
+		string to_upper(string str);
+		string process_data(char *command);
 		void process_req();
 
 	public:
@@ -26,47 +27,97 @@ class Server{
 		void stop(int signum);	
 };
 
-string Server::process_data(json data){
-	string response;
-	if (data["command"] == "GET"){
-		response = mapObj.get_data(data["key"]);
-	}else if(data["command"] == "SET"){
-		response = mapObj.save_data(data["key"], data["value"], data["ttl"]);
-	}else if(data["command"] == "DEL"){
-		int res = mapObj.delete_data(data["key"]);
-		response = to_string(res);
-	}else if(data["command"] == "HSET"){
-		int res = hashmapObj.h_set(data["key"], data["field"], data["value"]);
-		response = to_string(res);
-	}else if(data["command"] == "HGET"){
-		response = hashmapObj.h_get(data["key"], data["field"]);
-	}else if(data["command"] == "HGETALL"){
-		response = hashmapObj.h_get_all(data["key"]);
-	}else if(data["command"] == "LPUSH"){
-		int length = listObj.l_push(data["key"], data["value"]);
-		response = to_string(length);
-	}else if(data["command"] == "LPOP"){
-		response = listObj.l_pop(data["key"]);
-	}else if(data["command"] == "LLEN"){
-		int length = listObj.l_len(data["key"]);
-		response = to_string(length);
-	}else if(data["command"] == "LRANGE"){
-		response = listObj.l_range(data["key"], data["start_index"], data["stop_index"]);
+vector<string> Server::split_string(char *command){
+	const char *delim = " ";
+    vector<string> command_data;
+    char *token = strtok(command, delim);
+    while (token){
+        command_data.push_back(string(token));
+        token = strtok(NULL, delim);
+    }
+	return command_data;
+}
+
+string Server::to_upper(string str){
+    transform(str.begin(), str.end(), str.begin(), ::toupper); 
+    return str;
+}
+
+
+string Server::process_data(char *command){
+	vector<string> command_data;
+    command_data = split_string(command);
+
+	if (to_upper(command_data.at(0))== "GET"){
+		if(command_data.size() < 2){
+			return "worng number of arguments";
+		}
+		return mapObj.get_data(command_data.at(1));
+	}else if(to_upper(command_data.at(0)) == "SET"){
+		if(command_data.size() < 3){
+			return "worng number of arguments";
+		}
+		if(command_data.size() == 3){
+			return  mapObj.save_data(command_data.at(1), command_data.at(2), -1);
+		}
+		return  mapObj.save_data(command_data.at(1), command_data.at(2), stoi(command_data.at(3)));
+	}else if(to_upper(command_data.at(0)) == "DEL"){
+		if(command_data.size() < 2){
+			return "worng number of arguments";
+		}
+		int res = mapObj.delete_data(command_data.at(1));
+		return to_string(res);
+	}else if(to_upper(command_data.at(0)) == "HSET"){
+		if(command_data.size() < 4){
+			return "worng number of arguments";
+		}
+		int res = hashmapObj.h_set(command_data.at(1), command_data.at(2), command_data.at(3));
+		return to_string(res);
+	}else if(to_upper(command_data.at(0)) == "HGET"){
+		if(command_data.size() < 3){
+			return "worng number of arguments";
+		}
+		return hashmapObj.h_get(command_data.at(1), command_data.at(2));
+	}else if(to_upper(command_data.at(0)) == "HGETALL"){
+		if(command_data.size() < 2){
+			return "worng number of arguments";
+		}
+		return hashmapObj.h_get_all(command_data.at(1));
+	}else if(to_upper(command_data.at(0)) == "LPUSH"){
+		if(command_data.size() < 3){
+			return "worng number of arguments";
+		}
+		int length = listObj.l_push(command_data.at(1), command_data.at(2));
+		return to_string(length);
+	}else if(to_upper(command_data.at(0)) == "LPOP"){
+		if(command_data.size() < 2){
+			return "worng number of arguments";
+		}
+		return listObj.l_pop(command_data.at(1));
+	}else if(to_upper(command_data.at(0)) == "LLEN"){
+		if(command_data.size() < 2){
+			return "worng number of arguments";
+		}
+		int length = listObj.l_len(command_data.at(1));
+		return to_string(length);
+	}else if(to_upper(command_data.at(0)) == "LRANGE"){
+		if(command_data.size() < 4){
+			return "worng number of arguments";
+		}
+		return listObj.l_range(command_data.at(1), stoi(command_data.at(2)) , stoi(command_data.at(3)));
 	}else{
-		response = "ERR unknown command";
+		return "ERR unknown command";
 	}
-	return response;
 }
 
 void Server::process_req(){
 	char *buffer;
-	json data; string response;
+	vector<string> data; string response;
 	while (true){
 		buffer = serverConnection.recieve_req();
 		if(buffer[0] == 0) break;
 		cout << "Request::" << buffer << "\n";
-		data = json::parse(buffer);
-		response = process_data(data);	
+		response = process_data(buffer);	
 		if ((serverConnection.send_res(response.c_str()) < 0)){
 			cout<< "Error while sending response \n";
 			break;

@@ -12,7 +12,7 @@ public:
     void create_socket();
     void get_host_ip(const char *name);
     void connet_to_server();
-    int send_req(const char *data);
+    void send_req(const char *data);
     char *recieve_res();
     void close_socket();
 };

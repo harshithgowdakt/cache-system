@@ -46,7 +46,7 @@ void ClientConnection::connet_to_server(){
     cout<<"Connected successfully \n";
 }
 
-int ClientConnection::send_req(const char *data){
+void ClientConnection::send_req(const char *data){
 	if ((send(socket_fd, data, strlen(data), 0)) < 0){
         cout<< "Error while sending response \n";
 		close_socket();

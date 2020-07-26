@@ -1,12 +1,10 @@
 #include <iostream> 
 #include <string.h>
 #include <time.h>
-#include <nlohmann/json.hpp>
 #include <algorithm>
 #include "connection/ClientConnection.h"
 
 using namespace std;
-using json = nlohmann::json;
    
 class Client{
 private:
@@ -23,61 +21,15 @@ public:
 
 string Client::to_upper(string str){
     transform(str.begin(), str.end(), str.begin(), ::toupper);
+    cout << "upper case"<<str; 
     return str;
 }
 
 string Client::get_user_data(){
-    string command, key, value, field;
-    time_t ttl;
-    int start_index, stop_index;
-    json json_data;
-
+    string command;
     cout << "Enter the command::";
-    cin >> command;
-    command = to_upper(command);
-    json_data["command"] = command;
-    if(command == "EXIT"){
-        close_connection();
-    }else if (command == "GET" || command == "DEL" || 
-              command == "HGETALL" || command == "LPOP" ||
-              command == "LLEN"){
-        cin >> key;
-        json_data["key"] = key;
-    } else if (command == "SET"){
-        cin >> key;
-        cin >> value;
-        cin >> ttl;
-        json_data["key"] = key;
-        json_data["value"] = value;
-        json_data["ttl"] = ttl;
-    } else if(command == "HSET"){
-        cin >> key;
-        cin >> field;
-        cin >> value;
-        json_data["key"] = key;
-        json_data["field"] = field;
-        json_data["value"] = value;
-    }else if(command == "HGET"){
-        cin >> key;
-        cin >> field;
-        json_data["key"] = key;
-        json_data["field"] = field;
-    }else if(command == "LPUSH"){
-        cin >> key;
-        cin >> value;
-        json_data["key"] = key;
-        json_data["value"] = value;
-    }else if(command == "LRANGE"){
-        cin >> key;
-        cin >> start_index;
-        cin >> stop_index;
-        json_data["key"] = key;
-        json_data["start_index"] = start_index;
-        json_data["stop_index"] = stop_index;
-    }else{
-        cout << "ERR unknown command \n";
-    }
-    return json_data.dump();
+    getline(cin, command);
+    return command;
 }
 
 void Client::close_connection(){
