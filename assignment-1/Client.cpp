@@ -10,7 +10,6 @@ class Client{
 private:
     ClientConnection clientConnection;
 
-    string to_upper(string str);
     string get_user_data();
 
 public:
@@ -18,12 +17,6 @@ public:
     void send_request();
     void close_connection();
 };
-
-string Client::to_upper(string str){
-    transform(str.begin(), str.end(), str.begin(), ::toupper);
-    cout << "upper case"<<str; 
-    return str;
-}
 
 string Client::get_user_data(){
     string command;
